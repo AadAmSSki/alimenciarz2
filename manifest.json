@@ -1,0 +1,21 @@
+{
+  "name": "Karta Alimenciarza",
+  "short_name": "Alimenciarz",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#d8c180",
+  "theme_color": "#d8c180",
+  "description": "Generator Karty Alimenciarza z losowymi danymi i prywatnymi wiadomościami.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
