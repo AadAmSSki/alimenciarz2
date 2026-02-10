@@ -29,7 +29,7 @@ button{flex:1;padding:8px;border:none;border-radius:10px;background:#333;color:w
 
 <div id="generator">
 <input type="file" id="photoFile"><br>
-<input type="text" id="photoURL" placeholder="Link do zdjęcia (opcjonalne do linku)"><br>
+<input type="text" id="photoURL" placeholder="Link do zdjęcia (do linku)"><br>
 
 <input type="text" id="name" placeholder="Imię i nazwisko"><br>
 <input type="text" id="dob" placeholder="Data urodzenia"><br>
@@ -40,6 +40,11 @@ button{flex:1;padding:8px;border:none;border-radius:10px;background:#333;color:w
 <input type="text" id="kod" placeholder="Kod"><br>
 <input type="text" id="alimentRachunek" placeholder="Rachunek alimentacyjny"><br>
 <input type="number" id="alimentKwota" placeholder="Kwota alimentów"><br>
+
+<input type="number" id="children" placeholder="Ilość dzieci"><br>
+<input type="number" id="mothers" placeholder="Ilość zaliczonych matek"><br>
+<input type="number" id="ftmoInterventions" placeholder="Ilość interwencji FTMO"><br>
+<input type="number" id="grandmaRent" placeholder="Ilość zajebania renty babki"><br>
 
 <button onclick="randomData()">Losowe dane</button>
 <button onclick="generate()">Generuj kartę</button>
@@ -66,9 +71,12 @@ button{flex:1;padding:8px;border:none;border-radius:10px;background:#333;color:w
 
 <div class="buttons">
 <button onclick="toggleMore()">Więcej danych</button>
+<button onclick="toggleMsg()">Prywatne wiadomości</button>
 </div>
 
 <div id="moreData"></div>
+<div id="messages"><div id="chat"></div></div>
+
 <div class="bottomBar">✅ Dokument aktywny</div>
 </div>
 
@@ -87,19 +95,23 @@ reader.readAsDataURL(file);
 
 function randomData(){
 q('name').value="Jan Kowalski";
-q('dob').value="1998-05-12";
+q('dob').value="1997-04-12";
 q('citizenship').value="Polskie";
 q('rejon').value="Rejon AB";
 q('pesel').value=Math.floor(Math.random()*1e11);
 q('phone').value=Math.floor(Math.random()*1e9);
-q('kod').value="ABC-123";
-q('alimentRachunek').value="12345678901234567890123456";
-q('alimentKwota').value=1500;
+q('kod').value="ABC-"+Math.floor(Math.random()*999);
+q('alimentRachunek').value=Math.floor(Math.random()*1e26);
+q('alimentKwota').value=1000+Math.floor(Math.random()*4000);
+q('children').value=Math.floor(Math.random()*6);
+q('mothers').value=Math.floor(Math.random()*12);
+q('ftmoInterventions').value=Math.floor(Math.random()*20);
+q('grandmaRent').value=Math.floor(Math.random()*5);
 }
 
 function buildData(){
 return {
-photo:q('photoURL').value, // tylko URL idzie do linku
+photo:q('photoURL').value,
 name:q('name').value,
 pesel:q('pesel').value,
 phone:q('phone').value,
@@ -108,14 +120,15 @@ citizenship:q('citizenship').value,
 rejon:q('rejon').value,
 kod:q('kod').value,
 alimentRachunek:q('alimentRachunek').value,
-alimentKwota:q('alimentKwota').value
+alimentKwota:q('alimentKwota').value,
+children:q('children').value,
+mothers:q('mothers').value,
+ftmoInterventions:q('ftmoInterventions').value,
+grandmaRent:q('grandmaRent').value
 };
 }
 
-function generate(){
-const d=buildData();
-showCard(d);
-}
+function generate(){ showCard(buildData()); }
 
 function showCard(d){
 generator.style.display="none";
@@ -136,18 +149,35 @@ new QRCode(qrCode,{text:d.kod,width:70,height:70});
 window.currentData=d;
 }
 
+function toggleMore(){
+moreData.style.display=moreData.style.display==="none"?"block":"none";
+const d=window.currentData;
+moreData.innerHTML=
+"Kod: "+d.kod+
+"<br>Rachunek alimentacyjny: "+d.alimentRachunek+
+"<br>Ilość dzieci: "+d.children+
+"<br>Ilość zaliczonych matek: "+d.mothers+
+"<br>Ilość interwencji FTMO: "+d.ftmoInterventions+
+"<br>Ilość zajebania renty babki: "+d.grandmaRent;
+}
+
+function toggleMsg(){
+messages.style.display=messages.style.display==="none"?"block":"none";
+if(messages.style.display==="block"){
+setInterval(()=>{
+const p=document.createElement("p");
+p.innerHTML="<b>FTMO:</b> Nie opłaciłeś alimentów cwelu";
+chat.appendChild(p);
+},2500);
+}
+}
+
 function copyLink(){
 const d=buildData();
 const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(d))));
 const url=location.origin+location.pathname+"?d="+encoded;
 navigator.clipboard.writeText(url);
-alert("Link skopiowany (ze zdjęciem tylko jeśli podałeś URL)");
-}
-
-function toggleMore(){
-moreData.style.display=moreData.style.display==="none"?"block":"none";
-const d=window.currentData;
-moreData.innerHTML="Kod: "+d.kod+"<br>Rachunek: "+d.alimentRachunek;
+alert("Link karty skopiowany!");
 }
 
 window.onload=function(){
